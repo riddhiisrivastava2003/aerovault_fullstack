@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+  <h2>File Insights</h2>
+  <div class="card mb-3">
+    <div class="card-body">
+      <h5 class="card-title">{{ insights.name }}</h5>
+      <p class="card-text"><strong>Type:</strong> {{ insights.file_type }}</p>
+      <p class="card-text"><strong>Size:</strong> {{ insights.size }} bytes</p>
+      <p class="card-text"><strong>Uploaded:</strong> {{ insights.uploaded_on }}</p>
+      <hr />
+      <p class="card-text"><strong>Owner total files:</strong> {{ insights.owner_total_files }}</p>
+      <p class="card-text"><strong>Owner total storage:</strong> {{ insights.owner_total_storage }} bytes</p>
+      <p class="card-text"><strong>Files of same type by owner:</strong> {{ insights.same_type_count }}</p>
+    </div>
+  </div>
+  <a href="{% url 'files:list' %}" class="btn btn-secondary">Back to Files</a>
+</div>
+{% endblock %}

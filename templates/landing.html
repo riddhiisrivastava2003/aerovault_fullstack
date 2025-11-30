@@ -1,0 +1,321 @@
+{% extends 'base_landing.html' %}
+{% load static %}
+{% block content %}
+<style>
+    :root {
+        --primary-color: #0d6efd;
+        --primary-dark: #0a58ca;
+        --secondary-color: #6c757d;
+        --light-gray: #f8f9fa;
+        --dark-gray: #343a40;
+        --white: #ffffff;
+        --font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+        font-family: var(--font-family);
+        font-weight: 400;
+        line-height: 1.6;
+        color: var(--dark-gray);
+    }
+
+    .bg-light {
+        background-color: var(--light-gray) !important;
+    }
+
+    .btn {
+        border-radius: 50px;
+        padding: 12px 30px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .btn-primary {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+
+    .btn-primary:hover {
+        background-color: var(--primary-dark);
+        border-color: var(--primary-dark);
+        transform: translateY(-3px);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-outline-light {
+        border-color: var(--white);
+        color: var(--white);
+    }
+
+    .btn-outline-light:hover {
+        background-color: var(--white);
+        color: var(--primary-color);
+        transform: translateY(-3px);
+    }
+
+    .navbar-brand {
+        font-weight: 700;
+        font-size: 1.5rem;
+    }
+
+    /* Hero Section */
+    .hero {
+        background: linear-gradient(45deg, #001220, #003c66);
+        color: var(--white);
+        padding: 120px 0;
+        text-align: center;
+    }
+
+    .hero h1 {
+        font-weight: 700;
+        font-size: 3.8rem;
+        margin-bottom: 20px;
+    }
+
+    .hero p {
+        font-size: 1.3rem;
+        margin-bottom: 40px;
+        max-width: 700px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    /* Section Styles */
+    .section {
+        padding: 80px 0;
+    }
+
+    .section-title {
+        font-weight: 700;
+        font-size: 2.8rem;
+        margin-bottom: 60px;
+        text-align: center;
+        position: relative;
+    }
+
+    .section-title::after {
+        content: '';
+        position: absolute;
+        bottom: -15px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 60px;
+        height: 4px;
+        background-color: var(--primary-color);
+    }
+    
+    /* Feature Card */
+    .feature-card {
+        background: var(--white);
+        border: none;
+        border-radius: 15px;
+        padding: 40px;
+        transition: all 0.3s ease;
+        box-shadow: 0 5px 25px rgba(0, 0, 0, 0.07);
+        text-align: center;
+    }
+
+    .feature-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 12px 35px rgba(0, 0, 0, 0.1);
+    }
+
+    .feature-card .icon {
+        font-size: 3rem;
+        color: var(--primary-color);
+        margin-bottom: 20px;
+    }
+
+    .feature-card h5 {
+        font-weight: 600;
+        font-size: 1.25rem;
+        margin-bottom: 15px;
+    }
+
+    /* How It Works Section */
+    .how-it-works-step {
+        text-align: center;
+    }
+
+    .how-it-works-step .step-number {
+        width: 60px;
+        height: 60px;
+        background-color: var(--primary-color);
+        color: var(--white);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin: 0 auto 20px;
+    }
+
+    /* About Section */
+    .about-img {
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+
+    /* Footer */
+    .footer {
+        background-color: var(--dark-gray);
+        color: var(--white);
+        padding: 60px 0 20px;
+    }
+    
+    .footer h5 {
+        font-weight: 600;
+        margin-bottom: 20px;
+    }
+
+    .footer a {
+        color: rgba(255,255,255,0.7);
+        text-decoration: none;
+        transition: color 0.3s;
+    }
+
+    .footer a:hover {
+        color: var(--white);
+    }
+
+    .footer .social-icons a {
+        font-size: 1.5rem;
+        margin: 0 10px;
+    }
+</style>
+
+<!-- Hero Section -->
+<header class="hero">
+    <div class="container">
+        <h1 class="animate__animated animate__fadeInDown">Your Secure Digital Hub, Reimagined</h1>
+        <p class="animate__animated animate__fadeInUp">AeroVault is an intelligent, self-hosted file management platform that unifies your cloud storage and enhances your workflow with AI-powered insights.</p>
+        <div>
+            <a href="{% url 'accounts:login' %}" class="btn btn-primary btn-lg me-3 animate__animated animate__pulse">Get Started</a>
+            <a href="#features" class="btn btn-outline-light btn-lg">Learn More</a>
+        </div>
+    </div>
+</header>
+
+<!-- Features Section -->
+<section id="features" class="section bg-light">
+    <div class="container">
+        <h2 class="section-title">Why AeroVault is Different</h2>
+        <div class="row g-4">
+            <div class="col-lg-4 col-md-6">
+                <div class="feature-card h-100">
+                    <div class="icon"><i class="bi bi-cloud-check"></i></div>
+                    <h5>Intelligent Organization</h5>
+                    <p>AI-powered tagging and categorization automatically organize your files, making them instantly searchable.</p>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="feature-card h-100">
+                    <div class="icon"><i class="bi bi-search-heart"></i></div>
+                    <h5>Unified Search</h5>
+                    <p>Find any file, across all your linked cloud services, with one simple, powerful search.</p>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="feature-card h-100">
+                    <div class="icon"><i class="bi bi-shield-lock"></i></div>
+                    <h5>Unyielding Security</h5>
+                    <p>Keep control of your data with a self-hosted solution, complete with access controls and detailed activity logs.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How It Works Section -->
+<section id="how-it-works" class="section">
+    <div class="container">
+        <h2 class="section-title">Simple Steps to Efficiency</h2>
+        <div class="row g-5 text-center">
+            <div class="col-md-4">
+                <div class="how-it-works-step">
+                    <div class="step-number">1</div>
+                    <h5 class="fw-bold">Upload & Connect</h5>
+                    <p>Upload files directly or link your existing cloud accounts like Google Drive and Dropbox.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="how-it-works-step">
+                    <div class="step-number">2</div>
+                    <h5 class="fw-bold">Let AI Do the Work</h5>
+                    <p>AeroVault's AI analyzes and tags your files, creating a smart, organized digital library.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="how-it-works-step">
+                    <div class="step-number">3</div>
+                    <h5 class="fw-bold">Find & Manage</h5>
+                    <p>Instantly search, preview, and manage all your files from a single, intuitive dashboard.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- About Section -->
+<section id="about" class="section bg-light">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h2 class="section-title text-start" style="margin-bottom: 30px;">Built for Privacy and Power</h2>
+                <p class="lead">AeroVault was born from the belief that you shouldn't have to choose between convenience and control. As a self-hosted platform built on the robust Django framework, it puts you in the driver's seat of your digital life.</p>
+                <ul class="list-unstyled mt-4">
+                    <li class="mb-3 d-flex"><i class="bi bi-check-circle-fill text-primary me-3 fs-5"></i><span><strong>Total Privacy:</strong> Your files, your server. No third-party access, ever.</span></li>
+                    <li class="mb-3 d-flex"><i class="bi bi-check-circle-fill text-primary me-3 fs-5"></i><span><strong>Open & Extensible:</strong> Built with developers in mind, offering REST APIs for limitless integration.</span></li>
+                    <li class="mb-3 d-flex"><i class="bi bi-check-circle-fill text-primary me-3 fs-5"></i><span><strong>Community Driven:</strong> We are committed to building a transparent and open-source ecosystem.</span></li>
+                </ul>
+                <a href="{% url 'files:upload' %}" class="btn btn-primary mt-4">Start Uploading Now</a>
+            </div>
+            <div class="col-lg-6 text-center mt-4 mt-lg-0">
+                <img src="https://images.unsplash.com/photo-1558655146-d09347e92766?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80" class="img-fluid about-img" alt="Digital Privacy">
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-4 mb-4 mb-lg-0">
+                <h5>AeroVault</h5>
+                <p>The intelligent file hub for modern teams and individuals. Regain control of your digital world.</p>
+                <p class="small text-white-50">© 2025 AeroVault. All Rights Reserved.</p>
+            </div>
+            <div class="col-lg-2 col-md-4 col-6 mb-4 mb-lg-0">
+                <h5>Platform</h5>
+                <ul class="list-unstyled">
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="#how-it-works">How It Works</a></li>
+                    <li><a href="{% url 'accounts:login' %}">Login</a></li>
+                    <li><a href="{% url 'accounts:register' %}">Sign Up</a></li>
+                </ul>
+            </div>
+            <div class="col-lg-3 col-md-4 col-6 mb-4 mb-lg-0">
+                <h5>Legal</h5>
+                <ul class="list-unstyled">
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">Terms of Service</a></li>
+                    <li><a href="#">License</a></li>
+                </ul>
+            </div>
+            <div class="col-lg-3 col-md-4">
+                <h5>Connect With Us</h5>
+                <div class="social-icons">
+                    <a href="#" class="text-white"><i class="bi bi-twitter"></i></a>
+                    <a href="#" class="text-white"><i class="bi bi-github"></i></a>
+                    <a href="#" class="text-white"><i class="bi bi-linkedin"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+
+{% endblock %}

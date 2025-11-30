@@ -1,0 +1,63 @@
+{% extends 'adminpanel/dashboard.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid">
+    <h1 class="h3 mb-4 text-gray-800">File Management</h1>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">All Uploaded Files</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Owner</th>
+                            <th>Type</th>
+                            <th>Size</th>
+                            <th>Uploaded On</th>
+                            <th>Cloud</th>
+                            <th>Encrypted</th>
+                            <th>Tags</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for file in files %}
+                            <tr>
+                                <td>{{ file.name }}</td>
+                                <td>{{ file.owner.username }}</td>
+                                <td>{{ file.file_type }}</td>
+                                <td>{{ file.size|floatformat:0 }} bytes</td>
+                                <td>{{ file.uploaded_on }}</td>
+                                <td>{{ file.stored_cloud }}</td>
+                                <td>{% if file.encrypted %}Yes{% else %}No{% endif %}</td>
+                                <td>{{ file.tags|default:"-" }}</td>
+                                <td>
+                                    <a href="{% url 'adminpanel:admin_file_download' file.pk %}" class="btn btn-primary btn-sm">Download</a>
+                                    <a href="{% url 'adminpanel:admin_file_details' file.pk %}" class="btn btn-info btn-sm">Details</a>
+                                    <a href="{% url 'adminpanel:admin_file_delete' file.pk %}" class="btn btn-danger btn-sm">Delete</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

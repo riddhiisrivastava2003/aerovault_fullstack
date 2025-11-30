@@ -1,0 +1,28 @@
+{% extends 'adminpanel/dashboard.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid">
+    <h1 class="h3 mb-4 text-gray-800">File Details: {{ file_obj.name }}</h1>
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">File Information</h6>
+        </div>
+        <div class="card-body">
+            <p><strong>Owner:</strong> {{ file_obj.owner.username }}</p>
+            <p><strong>File Name:</strong> {{ file_obj.name }}</p>
+            <p><strong>File Type:</strong> {{ file_obj.file_type }}</p>
+            <p><strong>Size:</strong> {{ file_obj.size|floatformat:0 }} bytes</p>
+            <p><strong>Uploaded On:</strong> {{ file_obj.uploaded_on }}</p>
+            <p><strong>Stored Cloud:</strong> {{ file_obj.stored_cloud }}</p>
+            <p><strong>Encrypted:</strong> {% if file_obj.encrypted %}Yes{% else %}No{% endif %}</p>
+            <p><strong>Tags:</strong> {{ file_obj.tags|default:"-" }}</p>
+            <hr>
+            <a href="{% url 'adminpanel:admin_file_download' file_obj.pk %}" class="btn btn-primary btn-sm">Download</a>
+            <a href="{% url 'adminpanel:admin_file_delete' file_obj.pk %}" class="btn btn-danger btn-sm">Delete</a>
+            <a href="{% url 'adminpanel:files' %}" class="btn btn-secondary btn-sm">Back to Files</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

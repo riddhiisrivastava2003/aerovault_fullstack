@@ -1,0 +1,19 @@
+{% extends 'adminpanel/dashboard.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid">
+    <h1 class="h3 mb-4 text-gray-800">Delete File</h1>
+
+    <div class="card shadow mb-4">
+        <div class="card-body">
+            <p>Are you sure you want to delete the file "{{ file_obj.name }}" (ID: {{ file_obj.pk }}) uploaded by "{{ file_obj.owner.username }}"?</p>
+            <form method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">Delete</button>
+                <a href="{% url 'adminpanel:files' %}" class="btn btn-secondary">Cancel</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

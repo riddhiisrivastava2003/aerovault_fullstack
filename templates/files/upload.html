@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% block page_title %}Upload Files{% endblock %}
+{% block content %}
+<div class="row">
+  <div class="col-lg-8 offset-lg-2">
+    <div class="card shadow-sm">
+      <div class="card-header">
+        <h4 class="mb-0"><i class="bi bi-cloud-arrow-up me-2"></i>Upload New Files</h4>
+      </div>
+      <div class="card-body">
+        <form method="post" enctype="multipart/form-data" id="uploadForm">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label for="id_files" class="form-label">Select Files</label>
+            <input type="file" name="files" multiple class="form-control" id="id_files" />
+          </div>
+          <div class="mb-3 form-check">
+            <input type="checkbox" class="form-check-input" id="autoCloud" name="auto_cloud" />
+            <label class="form-check-label" for="autoCloud">Auto cloud selection (AI)</label>
+          </div>
+          <div class="mb-3 form-check">
+            <input type="checkbox" class="form-check-input" id="encrypt" name="encrypt" />
+            <label class="form-check-label" for="encrypt">Encrypt files before upload</label>
+          </div>
+          <div class="mb-3">
+            <label for="id_tags" class="form-label">Tags (comma separated)</label>
+            <input type="text" name="tags" class="form-control" id="id_tags" placeholder="e.g., work, important, photos" />
+          </div>
+          <div class="mb-4">
+            <div id="progress" class="progress" style="height:25px; display:none;">
+              <div id="progressBar" class="progress-bar progress-bar-striped progress-bar-animated bg-primary" role="progressbar" style="width:0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
+            </div>
+          </div>
+          <button class="btn btn-primary w-100" type="submit">Upload Files</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const uploadForm = document.getElementById('uploadForm');
+  const progressBarContainer = document.getElementById('progress');
+  const progressBar = document.getElementById('progressBar');
+
+  uploadForm.addEventListener('submit', function(e){
+    e.preventDefault();
+    
+    // Check if files are selected
+    const filesInput = document.getElementById('id_files');
+    if (filesInput.files.length === 0) {
+        alert('Please select at least one file to upload.');
+        return;
+    }
+
+    const formData = new FormData(uploadForm);
+    const xhr = new XMLHttpRequest();
+
+    progressBarContainer.style.display = 'block';
+    progressBar.style.width = '0%';
+    progressBar.textContent = '0%';
+    progressBar.setAttribute('aria-valuenow', '0');
+
+    xhr.open('POST', window.location.href);
+
+    xhr.upload.onprogress = function(event){
+      if(event.lengthComputable){
+        const pct = Math.round((event.loaded / event.total)*100);
+        progressBar.style.width = pct + '%';
+        progressBar.textContent = pct + '%';
+        progressBar.setAttribute('aria-valuenow', pct);
+      }
+    };
+
+    xhr.onload = function(){
+      if(xhr.status >= 200 && xhr.status < 300){
+        window.location.href = '{% url "files:list" %}?upload_success=true';
+      } else {
+        alert('Upload failed. Please try again.');
+        progressBarContainer.style.display = 'none'; // Hide progress bar on failure
+      }
+    };
+
+    xhr.onerror = function() {
+        alert('An error occurred during the upload. Please check your network connection and try again.');
+        progressBarContainer.style.display = 'none'; // Hide progress bar on error
+    };
+
+    xhr.send(formData);
+  });
+});
+</script>
+{% endblock %}

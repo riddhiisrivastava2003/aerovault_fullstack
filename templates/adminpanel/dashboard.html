@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h2>Admin Dashboard</h2>
+  <div>
+    <a class="btn btn-sm btn-primary" href="{% url 'adminpanel:users' %}">Manage Users</a>
+    <a class="btn btn-sm btn-primary" href="{% url 'adminpanel:files' %}">Manage Files</a>
+    <a class="btn btn-sm btn-secondary" href="{% url 'adminpanel:logs' %}">Global Logs</a>
+  </div>
+</div>
+
+<div class="row g-3">
+  <div class="col-md-3">
+    <div class="card p-3">
+      <h6 class="text-muted">Total Users</h6>
+      <h3>{{ total_users }}</h3>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card p-3">
+      <h6 class="text-muted">Total Files</h6>
+      <h3>{{ total_files }}</h3>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card p-3">
+      <h6 class="text-muted">Total Storage</h6>
+      <h4>{{ total_storage }} bytes</h4>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card p-3">
+      <h6 class="text-muted">Estimated Monthly Cost</h6>
+      <h4>${{ cost_estimate }}</h4>
+    </div>
+  </div>
+</div>
+
+<div class="row mt-4">
+  <div class="col-md-6">
+    <div class="card p-3">
+      <h6 class="text-muted">Cloud Distribution</h6>
+      <ul class="list-group list-group-flush">
+        {% for cloud, count in cloud_distribution.items %}
+          <li class="list-group-item d-flex justify-content-between align-items-center">{{ cloud|default:'local' }}<span class="badge bg-primary">{{ count }}</span></li>
+        {% empty %}
+          <li class="list-group-item">No data</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card p-3">
+      <h6 class="text-muted">System Alerts</h6>
+      <ul class="list-group list-group-flush">
+        {% for a in alerts %}
+          <li class="list-group-item">{{ a.created_on }} — {{ a.action }}</li>
+        {% empty %}
+          <li class="list-group-item">No alerts</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="mt-4">
+  <h5>Recent Activity</h5>
+  <ul class="list-group">
+    {% for l in recent_logs %}
+      <li class="list-group-item">{{ l.created_on }} — {{ l.user }} — {{ l.action }} — {{ l.details }}</li>
+    {% empty %}
+      <li class="list-group-item">No logs</li>
+    {% endfor %}
+  </ul>
+</div>
+{% endblock %}

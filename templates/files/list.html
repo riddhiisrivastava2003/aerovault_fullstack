@@ -1,0 +1,163 @@
+{% extends 'base.html' %}
+{% block page_title %}My Files{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="mb-0"><i class="bi bi-files me-2"></i>My Files</h4>
+    <div class="d-flex">
+        <form class="d-flex me-2" role="search" action="{% url 'files:search' %}" method="get">
+            <input class="form-control me-2" type="search" placeholder="Search files..." aria-label="Search" name="q" value="{{ request.GET.q|default:'' }}">
+            <button class="btn btn-outline-success" type="submit"><i class="bi bi-search"></i></button>
+        </form>
+        <a class="btn btn-primary" href="{% url 'files:upload' %}">
+            <i class="bi bi-cloud-arrow-up me-2"></i>Upload New
+        </a>
+    </div>
+</div>
+
+{% if request.GET.upload_success %}
+<div class="alert alert-success alert-dismissible fade show" role="alert">
+    Your file(s) have been uploaded successfully!
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endif %}
+
+<div class="card shadow-sm">
+  <div class="card-body">
+    <div class="table-responsive">
+      <table class="table table-hover table-striped align-middle">
+        <thead>
+          <tr>
+            <th scope="col"></th> {# Thumbnail #}
+            <th scope="col">Name</th>
+            <th scope="col">Type</th>
+            <th scope="col">Size</th>
+            <th scope="col">Uploaded</th>
+            <th scope="col">Stored</th>
+            <th scope="col">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for f in files %}
+            <tr>
+              <td>
+                {% if f.thumbnail %}
+                  <img src="{{ f.thumbnail.url }}" alt="thumbnail" class="img-thumbnail" style="width:64px;height:auto;cursor:pointer;" data-bs-toggle="modal" data-bs-target="#previewModal" data-url="{{ f.file.url }}" />
+                {% else %}
+                  <div class="file-icon-placeholder">
+                    <i class="bi bi-file-earmark" style="font-size: 2rem;"></i>
+                  </div>
+                {% endif %}
+              </td>
+              <td>{{ f.name }}</td>
+              <td>{{ f.file_type }}</td>
+              <td>{{ f.size|filesizeformat }}</td>
+              <td>{{ f.uploaded_on|date:"M d, Y H:i" }}</td>
+              <td>{{ f.stored_cloud }}</td>
+              <td>
+                <div class="dropdown">
+                  <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="fileActions{{ f.pk }}" data-bs-toggle="dropdown" aria-expanded="false">
+                    Actions
+                  </button>
+                  <ul class="dropdown-menu" aria-labelledby="fileActions{{ f.pk }}">
+                    <li><a class="dropdown-item" href="{% url 'files:download' f.pk %}"><i class="bi bi-download me-2"></i>Download</a></li>
+                    <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#previewModal" data-url="{{ f.file.url }}"><i class="bi bi-eye me-2"></i>Preview</a></li>
+                    <li><a class="dropdown-item" href="{% url 'files:insights' f.pk %}"><i class="bi bi-graph-up me-2"></i>Insights</a></li>
+                    <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#cloudModal" data-cloud="{{ f.stored_cloud }}" data-path="{{ f.file.url }}"><i class="bi bi-cloud-check me-2"></i>View Cloud</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item text-danger" href="{% url 'files:delete' f.pk %}"><i class="bi bi-trash me-2"></i>Delete</a></li>
+                  </ul>
+                </div>
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="7" class="text-center py-4">
+                <p class="lead text-muted">No files found. <a href="{% url 'files:upload' %}">Upload your first file!</a></p>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<!-- Add custom CSS for file icon placeholder -->
+<style>
+  .file-icon-placeholder {
+    width: 64px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: .25rem;
+    color: #6c757d;
+  }
+</style>
+
+<!-- Preview modal -->
+<div class="modal fade" id="previewModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Preview</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body text-center">
+        <img id="previewImage" src="" alt="preview" style="max-width:100%;height:auto;display:none;" />
+        <p id="previewLink" class="py-3" style="display:none;"><a id="previewHref" href="#" target="_blank" class="btn btn-primary"><i class="bi bi-box-arrow-up-right me-2"></i>Open file in new tab</a></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+var previewModal = document.getElementById('previewModal')
+previewModal.addEventListener('show.bs.modal', function (event) {
+  var button = event.relatedTarget
+  var url = button.getAttribute('data-url')
+  var img = document.getElementById('previewImage')
+  var link = document.getElementById('previewLink')
+  var href = document.getElementById('previewHref')
+  // simple check for image extension
+  if(url.match(/\.(jpg|jpeg|png|gif|bmp|webp)$/i)){
+    img.src = url; img.style.display='block'; link.style.display='none';
+  } else {
+    img.style.display='none'; link.style.display='block'; href.href = url;
+  }
+})
+</script>
+
+<!-- Cloud location modal -->
+<div class="modal fade" id="cloudModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-sm modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Cloud Location</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p><strong>Cloud:</strong> <span id="cloudName"></span></p>
+        <p><strong>Path:</strong> <a id="cloudPath" href="#" target="_blank"></a></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+var cloudModal = document.getElementById('cloudModal')
+cloudModal.addEventListener('show.bs.modal', function (event) {
+  var button = event.relatedTarget
+  var cloud = button.getAttribute('data-cloud')
+  var path = button.getAttribute('data-path')
+  document.getElementById('cloudName').textContent = cloud || 'local'
+  var a = document.getElementById('cloudPath')
+  a.textContent = path || 'N/A'
+  a.href = path || '#'
+})
+</script>
+{% endblock %}

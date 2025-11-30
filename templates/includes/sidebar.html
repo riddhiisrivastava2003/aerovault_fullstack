@@ -1,0 +1,87 @@
+<aside class="sidebar">
+  <div class="sidebar-header pb-4">
+    <a href="{% url 'dashboard:home' %}" class="sidebar-brand">
+      <i class="bi bi-cloud-check-fill me-2"></i>
+      <span>AeroVault</span>
+    </a>
+  </div>
+  <nav class="sidebar-nav">
+    <ul class="nav flex-column mb-auto">
+      <li class="nav-item">
+        <a href="{% url 'dashboard:home' %}" class="nav-link {% if request.path == '/dashboard/' %}active{% endif %}">
+          <i class="bi bi-grid-fill me-2"></i>
+          <span>Dashboard</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="{% url 'files:list' %}" class="nav-link {% if 'files' in request.path and 'analytics' not in request.path %}active{% endif %}">
+          <i class="bi bi-files me-2"></i>
+          <span>My Files</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="{% url 'files:upload' %}" class="nav-link {% if 'upload' in request.path %}active{% endif %}">
+          <i class="bi bi-cloud-arrow-up-fill me-2"></i>
+          <span>Upload</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="{% url 'files:analytics' %}" class="nav-link {% if 'analytics' in request.path %}active{% endif %}">
+          <i class="bi bi-pie-chart-fill me-2"></i>
+          <span>Insights</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="{% url 'accounts:profile' %}" class="nav-link {% if 'profile' in request.path %}active{% endif %}">
+          <i class="bi bi-person-fill-gear me-2"></i>
+          <span>Settings</span>
+        </a>
+      </li>
+      {% if user.is_staff %}
+      <li class="nav-item-divider my-3"></li>
+      <li class="nav-item">
+        <a href="{% url 'adminpanel:dashboard' %}" class="nav-link {% if 'adminpanel' in request.path and not 'users' in request.path and not 'files' in request.path and not 'logs' in request.path and not 'system-monitor' in request.path and not 'cloud-settings' in request.path %}active{% endif %}">
+          <i class="bi bi-shield-lock-fill me-2"></i>
+          <span>Admin Panel</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="{% url 'adminpanel:users' %}" class="nav-link {% if 'adminpanel/users' in request.path %}active{% endif %}">
+          <i class="bi bi-people-fill me-2"></i>
+          <span>User Management</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="{% url 'adminpanel:files' %}" class="nav-link {% if 'adminpanel/files' in request.path %}active{% endif %}">
+          <i class="bi bi-folder-fill me-2"></i>
+          <span>File Management</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="{% url 'adminpanel:logs' %}" class="nav-link {% if 'adminpanel/logs' in request.path %}active{% endif %}">
+          <i class="bi bi-file-earmark-text-fill me-2"></i>
+          <span>Activity Logs</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="{% url 'adminpanel:system_monitor' %}" class="nav-link {% if 'adminpanel/system-monitor' in request.path %}active{% endif %}">
+          <i class="bi bi-cpu-fill me-2"></i>
+          <span>System Monitor</span>
+        </a>
+      </li>
+      <!-- <li class="nav-item">
+        <a href="{% url 'adminpanel:cloud_settings' %}" class="nav-link {% if 'adminpanel/cloud-settings' in request.path %}active{% endif %}">
+          <i class="bi bi-cloud-fill me-2"></i>
+          <span>Cloud Settings</span>
+        </a>
+      </li> -->
+      {% endif %}
+    </ul>
+  </nav>
+  <div class="sidebar-footer">
+    <a href="{% url 'accounts:logout' %}" class="nav-link text-danger">
+      <i class="bi bi-box-arrow-left me-2"></i>
+      <span>Logout</span>
+    </a>
+  </div>
+</aside>

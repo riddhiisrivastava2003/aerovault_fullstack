@@ -1,0 +1,180 @@
+{% extends 'base.html' %}
+{% block page_title %}File Insights{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="mb-0"><i class="bi bi-pie-chart-fill me-2"></i>File Insights</h4>
+    <a href="{% url 'files:list' %}" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left me-2"></i>Back to Files
+    </a>
+</div>
+
+<div class="row g-4">
+    <div class="col-md-6">
+      <div class="card shadow-sm h-100">
+        <div class="card-header">
+          <h6 class="mb-0"><i class="bi bi-graph-up me-2"></i>Upload History (last 30 days)</h6>
+        </div>
+        <div class="card-body">
+          <canvas id="uploadHistory"></canvas>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card shadow-sm h-100">
+        <div class="card-header">
+          <h6 class="mb-0"><i class="bi bi-cloud-fill me-2"></i>Cloud-wise Distribution</h6>
+        </div>
+        <div class="card-body">
+          <canvas id="cloudChart"></canvas>
+        </div>
+      </div>
+    </div>
+</div>
+<div class="row g-4 mt-4">
+    <div class="col-md-6">
+      <div class="card shadow-sm h-100">
+        <div class="card-header">
+          <h6 class="mb-0"><i class="bi bi-file-earmark-bar-graph me-2"></i>File Type Distribution</h6>
+        </div>
+        <div class="card-body">
+          <canvas id="typeChart"></canvas>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card shadow-sm h-100">
+        <div class="card-header">
+          <h6 class="mb-0"><i class="bi bi-hdd-fill me-2"></i>Storage Usage by Type</h6>
+        </div>
+        <div class="card-body">
+          <canvas id="storageChart"></canvas>
+        </div>
+      </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.0/dist/chart.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', async function(){
+  async function fetchJSON(url){ const res = await fetch(url); return res.json(); }
+
+  const palette = [
+      '#667eea', '#764ba2', '#f093fb', '#f5576c', '#4facfe', '#00f2fe', '#43e97b',
+      '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40'
+  ];
+
+  try{
+    const uh = await fetchJSON('{% url "analytics:upload_history" %}');
+    const cloud = await fetchJSON('{% url "analytics:cloud_distribution" %}');
+    const type = await fetchJSON('{% url "analytics:filetype_distribution" %}');
+    const storage = await fetchJSON('{% url "analytics:storage_usage" %}');
+
+    // Upload history line chart
+    const uhLabels = uh.data.map(d=>d.day);
+    const uhValues = uh.data.map(d=>d.count);
+    new Chart(document.getElementById('uploadHistory').getContext('2d'), { 
+        type:'line', 
+        data:{ 
+            labels:uhLabels, 
+            datasets:[{
+                label:'Uploads', 
+                data:uhValues, 
+                borderColor: palette[0], 
+                backgroundColor: 'rgba(102, 126, 234, 0.2)', // Using primary color with transparency
+                tension: 0.3,
+                fill: true
+            }] 
+        }, 
+        options:{
+            responsive:true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                y: { beginAtZero: true, ticks: { precision: 0 } },
+                x: { grid: { display: false } }
+            }
+        } 
+    });
+
+    // Cloud distribution doughnut
+    const cloudLabels = cloud.data.map(d=>d.cloud || 'local');
+    const cloudValues = cloud.data.map(d=>d.count);
+    new Chart(document.getElementById('cloudChart').getContext('2d'), { 
+        type:'doughnut', 
+        data:{ 
+            labels:cloudLabels, 
+            datasets:[{
+                data:cloudValues, 
+                backgroundColor:palette,
+                hoverOffset: 4
+            }] 
+        }, 
+        options:{
+            responsive:true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'bottom' }
+            }
+        } 
+    });
+
+    // File type distribution
+    const typeLabels = type.data.map(d=>d.type || 'unknown');
+    const typeValues = type.data.map(d=>d.count);
+    new Chart(document.getElementById('typeChart').getContext('2d'), { 
+        type:'bar', 
+        data:{ 
+            labels:typeLabels, 
+            datasets:[{
+                label:'Files', 
+                data:typeValues, 
+                backgroundColor:palette[2], // A distinct color from palette
+                borderRadius: 5
+            }] 
+        }, 
+        options:{
+            responsive:true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                y: { beginAtZero: true, ticks: { precision: 0 } },
+                x: { grid: { display: false } }
+            }
+        } 
+    });
+
+    // Storage usage by type (bar)
+    const sLabels = storage.data.map(d=>d.type || 'unknown');
+    const sValues = storage.data.map(d=>Math.round((d.total||0)/1024/1024)); // MB
+    new Chart(document.getElementById('storageChart').getContext('2d'), { 
+        type:'bar', 
+        data:{ 
+            labels:sLabels, 
+            datasets:[{
+                label:'Storage (MB)', 
+                data:sValues, 
+                backgroundColor:palette[4], // Another distinct color from palette
+                borderRadius: 5
+            }] 
+        }, 
+        options:{
+            responsive:true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: true, position: 'bottom' }
+            },
+            scales: {
+                y: { beginAtZero: true, ticks: { precision: 0 } },
+                x: { grid: { display: false } }
+            }
+        } 
+    });
+
+  }catch(e){ console.error(e); }
+});
+</script>
+{% endblock %}

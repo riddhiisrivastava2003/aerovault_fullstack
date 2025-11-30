@@ -1,0 +1,198 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="h4 mb-0"><i class="bi bi-speedometer2 me-2"></i>Dashboard</h2>
+    <div>
+        <a class="btn btn-primary me-2" href="{% url 'files:upload' %}">
+            <i class="bi bi-cloud-arrow-up me-2"></i>Quick Upload
+        </a>
+        <a class="btn btn-outline-secondary" href="{% url 'files:analytics' %}">
+            <i class="bi bi-graph-up me-2"></i>File Insights
+        </a>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-xl-3 col-md-6">
+        <div class="card text-white bg-primary shadow-sm h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title mb-2 opacity-75">Total Files</h6>
+                        <h3 class="mb-0">{{ total_files }}</h3>
+                    </div>
+                    <i class="bi bi-file-earmark display-6 opacity-50"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="card text-white bg-info shadow-sm h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title mb-2 opacity-75">Storage Used</h6>
+                        <h4 class="mb-0">{{ storage|filesizeformat }}</h4>
+                    </div>
+                    <i class="bi bi-hdd display-6 opacity-50"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-6">
+        <div class="card h-100">
+            <div class="card-body">
+                <h6 class="card-title mb-3"><i class="bi bi-pie-chart me-2"></i>Storage Overview</h6>
+                <p class="mb-2 small text-muted">Total Used: <strong>{{ storage|filesizeformat }}</strong> of <strong>10 GB</strong></p>
+                <div class="progress" style="height: 10px;">
+                    <div class="progress-bar bg-primary" role="progressbar" 
+                         style="width: {% widthratio storage 10737418240 100 %}%"
+                         aria-valuenow="{{ storage }}" 
+                         aria-valuemin="0" 
+                         aria-valuemax="10737418240">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mt-4">
+    <div class="col-lg-6">
+        <div class="card h-100">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="bi bi-clock-history me-2"></i>Recent Uploads</h6>
+            </div>
+            <div class="card-body p-0">
+                <div class="list-group list-group-flush">
+                    {% for f in recent %}
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center flex-grow-1">
+                            <i class="bi bi-file me-3"></i>
+                            <div>
+                                <h6 class="mb-0">{{ f.name }}</h6>
+                                <small class="text-muted">{{ f.file_type }} • {{ f.size|filesizeformat }}</small>
+                            </div>
+                        </div>
+                        <div>
+                            <a class="btn btn-sm btn-outline-primary me-1" href="{% url 'files:download' f.pk %}" title="Download">
+                                <i class="bi bi-download"></i>
+                            </a>
+                            <a class="btn btn-sm btn-outline-info" href="{% url 'files:insights' f.pk %}" title="Insights">
+                                <i class="bi bi-graph-up"></i>
+                            </a>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="p-4 text-center text-muted">
+                        <p class="mb-0">No recent uploads. <a href="{% url 'files:upload' %}">Upload your first file!</a></p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="card h-100">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="bi bi-pie-chart me-2"></i>File Types</h6>
+            </div>
+            <div class="card-body">
+                <canvas id="typeChart" style="max-height: 300px;"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="bi bi-cloud me-2"></i>Cloud Distribution</h6>
+            </div>
+            <div class="card-body">
+                <canvas id="cloudChart" height="100"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.0/dist/chart.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const cloudData = {{ cloud_distribution|safe }};
+    const typeData = {{ type_distribution|safe }};
+
+    const cloudLabels = Object.keys(cloudData);
+    const cloudValues = cloudLabels.map(k => cloudData[k]);
+
+    const typeLabels = Object.keys(typeData);
+    const typeValues = typeLabels.map(k => typeData[k]);
+    
+    const palette = ['#667eea', '#764ba2', '#f093fb', '#f5576c', '#4facfe', '#00f2fe', '#43e97b'];
+
+    const ctxCloud = document.getElementById('cloudChart')?.getContext('2d');
+    if (ctxCloud) {
+        new Chart(ctxCloud, {
+            type: 'bar',
+            data: { 
+                labels: cloudLabels, 
+                datasets: [{ 
+                    label: 'Files per Cloud',
+                    data: cloudValues, 
+                    backgroundColor: palette,
+                    borderColor: palette,
+                    borderWidth: 1,
+                    borderRadius: 4
+                }] 
+            },
+            options: { 
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
+            }
+        });
+    }
+
+    const ctxType = document.getElementById('typeChart')?.getContext('2d');
+    if (ctxType) {
+        new Chart(ctxType, {
+            type: 'doughnut',
+            data: { 
+                labels: typeLabels, 
+                datasets: [{ 
+                    data: typeValues, 
+                    backgroundColor: palette,
+                    hoverBackgroundColor: palette,
+                    hoverBorderColor: "rgba(255, 255, 255, 1)",
+                    borderColor: 'white',
+                    borderWidth: 2
+                }] 
+            },
+            options: { 
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'bottom' },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.label || '';
+                                if (label) label += ': ';
+                                if (context.parsed !== null) label += context.parsed + ' files';
+                                return label;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+});
+</script>
+{% endblock %}
